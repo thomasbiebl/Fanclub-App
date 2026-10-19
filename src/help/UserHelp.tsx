@@ -196,7 +196,7 @@ export function userSections(s: Settings): HelpSection[] {
         <>
           <ul>
             <li><b>Name und Passwort</b> kannst du jederzeit ändern.</li>
-            <li><b>Design:</b> Es gibt vier Farbwelten (Stadion-Nacht, Klassisch, Clean, Ticket). Die Wahl gilt nur auf diesem Gerät.</li>
+            <li><b>Design:</b> Vier allgemeine Farbwelten (Stadion-Nacht, Klassisch, Clean, Ticket) und die Vereinsfarben aller Clubs der 1. und 2. Bundesliga, jeweils hell oder dunkel (oder wie dein Handy eingestellt ist). Deine Wahl gilt nur auf diesem Gerät. {s.defaultTheme ? 'Euer Verein hat ein Standard-Design festgelegt, das du hier ändern oder mit „Standard des Vereins verwenden“ wieder einschalten kannst.' : 'Wenn dein Verein ein Standard-Design festlegt, siehst du es, bis du selbst eines wählst.'}</li>
             <li><b>Meine Daten herunterladen:</b> Du bekommst eine Datei mit allem, was über dich gespeichert ist.</li>
             <li><b>Konto löschen:</b> Dein Konto und deine Buchungen werden endgültig gelöscht. Das lässt sich nicht rückgängig machen.</li>
           </ul>

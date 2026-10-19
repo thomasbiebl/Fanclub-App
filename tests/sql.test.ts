@@ -67,7 +67,7 @@ afterAll(() => db.close());
 beforeEach(async () => {
   await db.exec(`delete from bookings; delete from trips; delete from news; delete from auth.users; delete from member_roster; delete from member_code_attempts; delete from audit_log;
     update member_secrets set member_code = '';
-    update settings set club_name = 'Fanclub', interest_days = 3, guests_may_book = true, waitlist_enabled = true`);
+    update settings set club_name = 'Fanclub', interest_days = 3, guests_may_book = true, waitlist_enabled = true, default_theme = '', max_companions = 3, no_show_penalty = 0, cancel_deadline_hours = 0`);
   await addUser('admin', { member: true, admin: true });
   await addUser('anna', { member: true, base: 5 });
   await addUser('max', { member: true, base: 9 });
@@ -514,6 +514,24 @@ describe('admin cancels bookings', () => {
     await as('karl', `select book_trip($1)`, [interest]);
     await as('admin', `select admin_cancel_booking($1)`, [await bookingOf(interest, 'karl')]);
     expect(await statuses(interest)).toEqual({});
+  });
+});
+
+describe('default theme', () => {
+  it('is readable before login and only writable by admins, with a sane format', async () => {
+    await as('admin', `update settings set default_theme = 'club-dortmund'`);
+    await db.exec(`set role anon`);
+    expect((await db.query(`select default_theme from settings`)).rows).toEqual([{ default_theme: 'club-dortmund' }]);
+    await db.exec(`reset role`);
+    await as('anna', `update settings set default_theme = 'club-bayern'`);
+    expect((await db.query(`select default_theme from settings`)).rows).toEqual([{ default_theme: 'club-dortmund' }]);
+    expect(await asErr('admin', `update settings set default_theme = 'Böse; drop'`)).toMatch(/check constraint/);
+  });
+
+  it('shows up in the change log', async () => {
+    await db.query(`delete from audit_log`);
+    await as('admin', `update settings set default_theme = 'club-bayern', max_companions = 0`);
+    expect((await db.query(`select detail from audit_log`)).rows).toEqual([{ detail: 'Begleitpersonen, Standard-Design' }]);
   });
 });
 

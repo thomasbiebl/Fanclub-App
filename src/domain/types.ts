@@ -141,6 +141,8 @@ export interface Settings {
   maxCompanions: number;
   /** Points deducted from the ranking score for each no-show (0 = off). */
   noShowPenalty: number;
+  /** Design everybody sees until they pick their own (theme id, empty = the app's own default). */
+  defaultTheme: string;
   /** Code that makes a user a member when entered in the profile. Empty = off. Only admins get to see it. */
   memberCode: string;
 }
@@ -156,6 +158,7 @@ export const DEFAULT_SETTINGS: Settings = {
   cancelDeadlineHours: 0,
   maxCompanions: 3,
   noShowPenalty: 0,
+  defaultTheme: '',
   memberCode: '',
 };
 

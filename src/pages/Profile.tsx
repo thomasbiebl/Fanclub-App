@@ -6,12 +6,13 @@ import { noShowCount, pastTripCount, userScore } from '../domain/rules';
 import { downloadFile } from '../lib/download';
 import { HELP_LINKS } from '../help/sections';
 import { useApp } from '../state/AppContext';
-import { THEMES } from '../themes';
+import { ThemeSelect } from '../components/ThemePicker';
+import { BASE_THEMES, findTheme, isClubTheme } from '../themes';
 import { useTheme } from '../themes/ThemeProvider';
 
 export function Profile() {
   const { snap, user, now, auth, data, act, notify, setSessionUser } = useApp();
-  const { theme, setTheme } = useTheme();
+  const { theme, setTheme, choice, clubDefault, mode, setMode } = useTheme();
   const nav = useNavigate();
   const [name, setName] = useState<string | null>(null);
   const [password, setPassword] = useState('');
@@ -115,7 +116,7 @@ export function Profile() {
         <section className="card">
           <h3>Design</h3>
           <div className="themes" role="radiogroup" aria-label="Design">
-            {THEMES.map((t) => (
+            {BASE_THEMES.map((t) => (
               <button key={t.id} role="radio" aria-checked={theme === t.id} className="theme" data-on={theme === t.id} onClick={() => setTheme(t.id)}>
                 <span className="swatches" aria-hidden="true">
                   {t.swatches.map((c) => <i key={c} style={{ background: c }} />)}
@@ -125,6 +126,21 @@ export function Profile() {
               </button>
             ))}
           </div>
+          <label htmlFor="club-theme" className="muted">Vereinsfarben der Bundesliga</label>
+          <ThemeSelect id="club-theme" value={isClubTheme(theme) ? theme : ''} emptyLabel="Kein Vereinsdesign" onChange={(id) => id && setTheme(id)} />
+          {isClubTheme(theme) && (
+            <div className="seg" role="group" aria-label="Hell oder dunkel">
+              {([['auto', 'Wie das Handy'], ['light', 'Hell'], ['dark', 'Dunkel']] as const).map(([m, label]) => (
+                <button key={m} className="chip" aria-pressed={mode === m} onClick={() => setMode(m)}>{label}</button>
+              ))}
+            </div>
+          )}
+          {clubDefault && (
+            <p className="muted">
+              Der Verein hat <b>{findTheme(clubDefault)?.label ?? clubDefault}</b> als Standard festgelegt.
+              {choice !== null && <> <button className="chip" onClick={() => setTheme(null)}>Standard des Vereins verwenden</button></>}
+            </p>
+          )}
         </section>
 
         <section className="card">

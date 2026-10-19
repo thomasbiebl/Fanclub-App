@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import type { Settings } from '../domain/types';
+import { findTheme } from '../themes';
 import { daysText, hoursText, priorityText } from './format';
 import type { HelpSection } from './sections';
 
@@ -213,6 +214,7 @@ export function adminSections(s: Settings): HelpSection[] {
                 <tr><td>Abzug bei Nichterscheinen (Punkte)</td><td>Punkte, die jemand pro „fehlt“ verliert, zusätzlich zu den entgangenen Fahrtpunkten.</td><td>{s.noShowPenalty}</td></tr>
                 <tr><td>Mitgliedscode</td><td>Code, mit dem man sich im Profil zum Mitglied macht. Leer = aus.</td><td>{s.memberCode ? 'gesetzt' : 'aus'}</td></tr>
                 <tr><td>Standard für neue Fahrten</td><td>Plätze, Preis und Treffpunkt, mit denen das Formular vorbelegt wird.</td><td>{s.defaultSeats} Plätze, {s.defaultPrice} €, {s.defaultMeetingPoint}</td></tr>
+                <tr><td>Standard-Design für alle</td><td>Das Design, das alle sehen, die keins gewählt haben, auch auf der Anmeldeseite. Zur Auswahl stehen die allgemeinen Designs und die Vereinsfarben der Bundesliga. Mitglieder können es im Profil für sich ändern.</td><td>{s.defaultTheme ? findTheme(s.defaultTheme)?.label ?? s.defaultTheme : 'App-Standard (Stadion-Nacht)'}</td></tr>
                 <tr><td>Vereinsname</td><td>Erscheint auf der Anmeldeseite, im Seitentitel und in E-Mails.</td><td>{s.clubName}</td></tr>
               </tbody>
             </table>

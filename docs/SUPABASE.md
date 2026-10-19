@@ -25,6 +25,7 @@ Ohne die Einstellungen unten läuft die App weiter im **Demo-Modus** (Daten nur 
    | `0007_roster.sql` | Mitgliederliste und Mitgliedscode |
    | `0008_audit.sql` | Änderungsprotokoll |
    | `0009_admin_cancel_booking.sql` | Admins stornieren Buchungen |
+   | `0010_default_theme.sql` | Standard-Design des Vereins |
 3. Hinweis zu `pg_cron`: Die Datei versucht, die automatische Vergabe alle 5 Minuten einzurichten. Klappt das nicht, erscheint nur ein Hinweis. Dann läuft die Vergabe beim Öffnen der App, was ebenfalls funktioniert. Aktivieren kannst du es unter *Database → Extensions → pg_cron*, danach die letzten Zeilen der Datei erneut ausführen.
 
 Kommt in einer neuen Version der App eine weitere Datei dazu (z. B. `0010_….sql`), führst du nur die neuen Dateien auf dieselbe Weise aus. Bereits ausgeführte Dateien nie ein zweites Mal ausführen.

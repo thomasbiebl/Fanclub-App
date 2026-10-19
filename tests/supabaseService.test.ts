@@ -31,7 +31,7 @@ function fakeClient(tables: Record<string, unknown[]>, loggedIn = true) {
 describe('SupabaseService', () => {
   it('maps database rows and merges names with full profiles', async () => {
     const { sb, calls } = fakeClient({
-      settings: [{ club_name: 'FC Test', interest_days: 2, guests_may_book: false, waitlist_enabled: true, default_seats: 40, default_price: '25.50', default_meeting_point: 'Hbf' }],
+      settings: [{ club_name: 'FC Test', interest_days: 2, guests_may_book: false, waitlist_enabled: true, default_seats: 40, default_price: '25.50', default_meeting_point: 'Hbf', default_theme: 'club-dortmund' }],
       public_profiles: [{ id: 'u1', name: 'Anna', base_trips: 3, is_member: true }, { id: 'u2', name: 'Max', base_trips: 9, is_member: true }],
       profiles: [{ id: 'u1', email: 'anna@x.de', name: 'Anna', is_member: true, is_admin: true, member_requested: false, base_trips: 3, created_at: '2026-01-01T00:00:00Z' }],
       trips: [{ id: 't1', title: 'A', departure: '2026-12-01T08:00:00Z', meeting_point: 'P', price: '28.00', seats: 50, created_at: '2026-11-01T00:00:00Z', interest_ends_at: '2026-11-04T00:00:00Z', allocated_at: null, kickoff: null, return_time: null, notes: '', cancelled_at: null, cancel_reason: null, stops: null, buses: 1, points: 2 }],
@@ -44,7 +44,7 @@ describe('SupabaseService', () => {
     });
     const snap = await new SupabaseService(sb).load();
     expect(calls).toContain('rpc allocate_due_trips {}');
-    expect(snap.settings).toMatchObject({ clubName: 'FC Test', interestDays: 2, guestsMayBook: false, defaultPrice: 25.5 });
+    expect(snap.settings).toMatchObject({ clubName: 'FC Test', interestDays: 2, guestsMayBook: false, defaultPrice: 25.5, defaultTheme: 'club-dortmund' });
     expect(snap.trips[0]).toMatchObject({ meetingPoint: 'P', price: 28, allocatedAt: undefined });
     expect(snap.bookings[0]).toMatchObject({ tripId: 't1', userId: 'u1', status: 'interested', companions: 1, companionNames: 'Petra', paid: true, attended: false });
     expect(snap.trips[0]).toMatchObject({ points: 2 });
@@ -99,7 +99,7 @@ describe('SupabaseService', () => {
     const { sb, calls } = fakeClient({});
     const svc = new SupabaseService(sb);
     await svc.saveTrip(null, { title: 'A', departure: '2026-12-01T08:00:00.000Z', meetingPoint: 'P', price: 10, seats: 5, notes: '', stops: [], buses: 1, points: 1 });
-    await svc.saveSettings({ clubName: 'X', interestDays: 1, guestsMayBook: true, waitlistEnabled: true, defaultSeats: 1, defaultPrice: 0, defaultMeetingPoint: 'P', cancelDeadlineHours: 0, maxCompanions: 3, noShowPenalty: 0, memberCode: 'abcd' });
+    await svc.saveSettings({ clubName: 'X', interestDays: 1, guestsMayBook: true, waitlistEnabled: true, defaultSeats: 1, defaultPrice: 0, defaultMeetingPoint: 'P', cancelDeadlineHours: 0, maxCompanions: 3, noShowPenalty: 0, defaultTheme: 'club-bayern', memberCode: 'abcd' });
     const written = calls.filter((c) => /^(insert|update)/.test(c)).flatMap((c) => Object.keys(JSON.parse(c.slice(c.indexOf('{')))));
     expect(written.length).toBeGreaterThan(8);
     for (const col of written) expect(migration, `column ${col}`).toContain(col);

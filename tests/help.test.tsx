@@ -84,7 +84,7 @@ describe('guide structure', () => {
 
   it('documents every admin setting by name', () => {
     const t = text(adminSections(DEFAULT_SETTINGS));
-    for (const name of ['Vorlauf für Mitglieder', 'Nicht-Mitglieder dürfen', 'Warteliste bei ausgebuchten', 'Stornofrist', 'Begleitpersonen pro Buchung', 'Abzug bei Nichterscheinen', 'Mitgliedscode', 'Standard für neue Fahrten', 'Vereinsname']) {
+    for (const name of ['Vorlauf für Mitglieder', 'Nicht-Mitglieder dürfen', 'Warteliste bei ausgebuchten', 'Stornofrist', 'Begleitpersonen pro Buchung', 'Abzug bei Nichterscheinen', 'Mitgliedscode', 'Standard für neue Fahrten', 'Standard-Design für alle', 'Vereinsname']) {
       expect(t, name).toContain(name);
     }
   });

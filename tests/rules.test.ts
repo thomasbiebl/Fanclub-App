@@ -134,6 +134,8 @@ describe('settings', () => {
     expect(validateSettings({ ...DEFAULT_SETTINGS, interestDays: 31 })).not.toBeNull();
     expect(validateSettings({ ...DEFAULT_SETTINGS, defaultSeats: 0 })).not.toBeNull();
     expect(validateSettings({ ...DEFAULT_SETTINGS, clubName: '  ' })).not.toBeNull();
+    expect(validateSettings({ ...DEFAULT_SETTINGS, defaultTheme: 'club-bayern' })).toBeNull();
+    expect(validateSettings({ ...DEFAULT_SETTINGS, defaultTheme: 'Böse; drop' })).not.toBeNull();
   });
 });
 

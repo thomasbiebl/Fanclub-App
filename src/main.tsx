@@ -16,14 +16,14 @@ registerSW({ immediate: true });
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
-    <ThemeProvider>
-      <ErrorBoundary>
-        <HashRouter>
-          <AppProvider>
+    <ErrorBoundary>
+      <HashRouter>
+        <AppProvider>
+          <ThemeProvider>
             <App />
-          </AppProvider>
-        </HashRouter>
-      </ErrorBoundary>
-    </ThemeProvider>
+          </ThemeProvider>
+        </AppProvider>
+      </HashRouter>
+    </ErrorBoundary>
   </StrictMode>,
 );

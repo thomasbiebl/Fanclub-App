@@ -23,14 +23,14 @@ Als „bisherige Fahrten“ zählen bestätigte Plätze auf abgefahrenen Fahrten
 - Begleitpersonen mitbringen, Zustiegsstelle wählen, Fahrpreis und Zahlungsstatus sehen
 - Mitteilungen in der App (Glocke) und optional per E-Mail: Platz vergeben, nachgerückt, Fahrt abgesagt, neue Fahrt, News
 - News lesen, Abfahrt in den Kalender übernehmen
-- Profil: Name und Passwort ändern, Mitgliedscode einlösen, Daten herunterladen, Konto löschen, Design wählen (Stadion-Nacht, Klassisch, Clean, Ticket)
+- Profil: Name und Passwort ändern, Mitgliedscode einlösen, Daten herunterladen, Konto löschen, Design wählen (vier allgemeine Designs und die Vereinsfarben aller Clubs der 1. und 2. Bundesliga, hell oder dunkel)
 
 **Für Admins**
 - Fahrten anlegen, bearbeiten, absagen, löschen (Anstoß, Rückfahrt, Hinweise, Zustiegsstellen, mehrere Busse, Punkte)
 - Teilnehmerliste je Fahrt mit Kasse (erwartet, bezahlt, offen), „bezahlt“ und „eingestiegen / nicht erschienen“ abhaken, Bus zuordnen, CSV-Export und Druckansicht
 - Benutzer verwalten, Mitgliederliste per CSV importieren, Mitgliedscode festlegen
 - News veröffentlichen und anpinnen
-- Einstellungen: Vorlauf für Mitglieder, Gäste dürfen buchen, Warteliste, Stornofrist, Begleitpersonen, Abzug bei Nichterscheinen, Vorgaben für neue Fahrten, Vereinsname
+- Einstellungen: Standard-Design für den ganzen Verein, Vorlauf für Mitglieder, Gäste dürfen buchen, Warteliste, Stornofrist, Begleitpersonen, Abzug bei Nichterscheinen, Vorgaben für neue Fahrten, Vereinsname
 - Änderungsprotokoll: wer hat wann was geändert
 - **Hilfe in der App** (Symbol „?“ oben, auch ohne Anmeldung unter `#/help`): Anleitung für Mitglieder und, nur für Admins, die genaue Buchungslogik mit allen Einstellungen. Die Texte folgen den Einstellungen des Vereins, das Rechenbeispiel zur Platzvergabe wird mit der echten Vergabe berechnet. Die Texte stehen in `src/help/`. Ändert sich eine Regel, passe dort den Text an, die Tests in `tests/help.test.tsx` melden Abweichungen.
 - Installierbar als PWA („Zum Startbildschirm hinzufügen“), läuft offline
@@ -72,7 +72,7 @@ Einmalig einrichten: *Settings → Pages → Source: GitHub Actions*. Für Branc
 - `src/domain/` – Regeln (Phasen, Vergabe, Warteliste, Punkte, Mitteilungen, Protokoll), reine Funktionen mit Tests in `tests/`
 - `src/data/DataService.ts` – Schnittstelle zum Speicher, `localStorageService.ts` ist die Demo-Umsetzung
 - `src/auth/AuthService.ts` – Schnittstelle zur Anmeldung, `localAuth.ts` ist die Demo-Umsetzung
-- `src/themes/` – Designs als CSS-Variablen. Neues Design: CSS-Datei mit `:root[data-theme='<id>']` anlegen, in `main.tsx` importieren und in `themes/index.ts` eintragen
+- `src/themes/` – Designs als CSS-Variablen. Allgemeine Designs: CSS-Datei mit `:root[data-theme='<id>']` anlegen, in `main.tsx` importieren und in `themes/index.ts` eintragen. Vereinsdesigns entstehen aus der Tabelle `clubs.ts` (zwei Farben pro Verein), `clubTheme.ts` erzeugt daraus alle Farben für hell und dunkel, `tests/themes.test.ts` prüft die Lesbarkeit. Einen Verein ergänzen oder eine Farbe korrigieren: nur `clubs.ts` ändern
 - `supabase/migrations/` – Datenbank (Tabellen, Zugriffsregeln, Vergabe), `supabase/functions/` – E-Mail-Versand
 - `mockups/` – statische Design-Entwürfe
 

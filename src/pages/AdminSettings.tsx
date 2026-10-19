@@ -2,10 +2,11 @@ import { useState, type FormEvent } from 'react';
 import { validateSettings } from '../domain/rules';
 import { DEFAULT_SETTINGS, type Settings } from '../domain/types';
 import { Link } from 'react-router-dom';
+import { ThemeSelect } from '../components/ThemePicker';
 import { HELP_LINKS } from '../help/sections';
 import { useApp } from '../state/AppContext';
 
-type Draft = Record<'clubName' | 'interestDays' | 'defaultSeats' | 'defaultPrice' | 'defaultMeetingPoint' | 'cancelDeadlineHours' | 'maxCompanions' | 'noShowPenalty' | 'memberCode', string> &
+type Draft = Record<'clubName' | 'interestDays' | 'defaultSeats' | 'defaultPrice' | 'defaultMeetingPoint' | 'cancelDeadlineHours' | 'maxCompanions' | 'noShowPenalty' | 'memberCode' | 'defaultTheme', string> &
   Pick<Settings, 'guestsMayBook' | 'waitlistEnabled'>;
 
 const toDraft = (s: Settings): Draft => ({
@@ -15,6 +16,7 @@ const toDraft = (s: Settings): Draft => ({
   maxCompanions: String(s.maxCompanions),
   noShowPenalty: String(s.noShowPenalty),
   memberCode: s.memberCode,
+  defaultTheme: s.defaultTheme,
   defaultSeats: String(s.defaultSeats),
   defaultPrice: String(s.defaultPrice),
   defaultMeetingPoint: s.defaultMeetingPoint,
@@ -29,6 +31,7 @@ const fromDraft = (d: Draft): Settings => ({
   maxCompanions: Number(d.maxCompanions),
   noShowPenalty: Number(d.noShowPenalty),
   memberCode: d.memberCode,
+  defaultTheme: d.defaultTheme,
   defaultSeats: Number(d.defaultSeats),
   defaultPrice: Number(d.defaultPrice),
   defaultMeetingPoint: d.defaultMeetingPoint,
@@ -62,6 +65,9 @@ export function AdminSettings() {
           <h3>Verein</h3>
           <label htmlFor="s-name">Vereinsname</label>
           <input id="s-name" required value={d.clubName} onChange={set('clubName')} />
+          <label htmlFor="s-theme">Standard-Design für alle</label>
+          <ThemeSelect id="s-theme" value={d.defaultTheme} emptyLabel="Stadion-Nacht (App-Standard)" onChange={(id) => setDraft({ ...d, defaultTheme: id })} />
+          <p className="muted">Wer kein eigenes Design gewählt hat, sieht dieses, auch auf der Anmeldeseite. Jedes Mitglied kann es im Profil für sich ändern.</p>
         </section>
 
         <section className="card form">

@@ -11,7 +11,7 @@ interface NewsRow { id: string; title: string; body: string; author_id: string |
 interface NotificationRow { id: string; user_id: string; type: Notification['type']; title: string; body: string; trip_id: string | null; created_at: string; read_at: string | null }
 interface AuditRow { id: number | string; at: string; actor_id: string | null; actor_name: string; action: AuditEntry['action']; detail: string }
 interface RosterRow { email: string; name: string; member_number: string }
-interface SettingsRow { club_name: string; interest_days: number; guests_may_book: boolean; waitlist_enabled: boolean; default_seats: number; default_price: number | string; default_meeting_point: string; cancel_deadline_hours: number; max_companions: number; no_show_penalty: number }
+interface SettingsRow { club_name: string; interest_days: number; guests_may_book: boolean; waitlist_enabled: boolean; default_seats: number; default_price: number | string; default_meeting_point: string; cancel_deadline_hours: number; max_companions: number; no_show_penalty: number; default_theme: string }
 
 const toUser = (r: ProfileRow): User => ({
   id: r.id, email: r.email ?? '', name: r.name, passwordHash: '', isMember: r.is_member, isAdmin: r.is_admin ?? false,
@@ -42,7 +42,7 @@ const toSettings = (r: SettingsRow | null): Settings =>
     clubName: r.club_name, interestDays: r.interest_days, guestsMayBook: r.guests_may_book, waitlistEnabled: r.waitlist_enabled,
     defaultSeats: r.default_seats, defaultPrice: Number(r.default_price), defaultMeetingPoint: r.default_meeting_point,
     cancelDeadlineHours: r.cancel_deadline_hours, maxCompanions: r.max_companions,
-    noShowPenalty: r.no_show_penalty, memberCode: '',
+    noShowPenalty: r.no_show_penalty, defaultTheme: r.default_theme ?? '', memberCode: '',
   } : { ...DEFAULT_SETTINGS };
 
 const ok: Result = { ok: true };
@@ -192,7 +192,7 @@ export class SupabaseService implements DataService {
       club_name: clean.clubName, interest_days: clean.interestDays, guests_may_book: clean.guestsMayBook,
       waitlist_enabled: clean.waitlistEnabled, default_seats: clean.defaultSeats, default_price: clean.defaultPrice,
       default_meeting_point: clean.defaultMeetingPoint, cancel_deadline_hours: clean.cancelDeadlineHours,
-      max_companions: clean.maxCompanions, no_show_penalty: clean.noShowPenalty,
+      max_companions: clean.maxCompanions, no_show_penalty: clean.noShowPenalty, default_theme: clean.defaultTheme,
     }).eq('id', 1);
     if (error) return fail(error);
     return fail((await this.sb.rpc('admin_set_member_code', { p_code: clean.memberCode })).error);

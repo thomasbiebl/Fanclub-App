@@ -35,6 +35,7 @@ const SETTING_LABEL: [keyof Settings, string][] = [
   ['cancelDeadlineHours', 'Stornofrist'],
   ['maxCompanions', 'Begleitpersonen'],
   ['noShowPenalty', 'Abzug bei Nichterscheinen'],
+  ['defaultTheme', 'Standard-Design'],
 ];
 
 const TRIP_FIELDS: (keyof Trip)[] = ['title', 'departure', 'meetingPoint', 'price', 'seats', 'kickoff', 'returnTime', 'notes', 'stops', 'buses', 'points'];
