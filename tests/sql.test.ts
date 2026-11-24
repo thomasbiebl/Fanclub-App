@@ -61,6 +61,15 @@ beforeAll(async () => {
   db = new PGlite();
   await db.exec(supabaseStub);
   for (const m of migrations) await db.exec(m);
+  // Postgres in WebAssembly only has a millisecond clock, so two bookings made right after each other
+  // can get the same created_at, and then the random id breaks the tie instead of who was first.
+  // Real bookings are seconds apart; keep the test bookings in the order they were made, too.
+  await db.exec(`create function test_booking_order() returns trigger language plpgsql as $$
+    begin
+      new.created_at := greatest(new.created_at, (select max(created_at) + interval '1 millisecond' from bookings));
+      return new;
+    end $$;
+    create trigger test_booking_order before insert on bookings for each row execute function test_booking_order();`);
 }, 60_000);
 afterAll(() => db.close());
 
@@ -230,9 +239,6 @@ describe('companions, stops and buses', () => {
     await as('max', `select book_trip($1, 2)`, [trip]);   // 9 trips, needs 3
     await as('karl', `select book_trip($1, 2)`, [trip]);  // 9 trips, needs 3 -> does not fit
     await as('anna', `select book_trip($1, 0)`, [trip]);  // 5 trips, needs 1 -> fits
-    // Max and Karl tie on trips, so the earlier booking wins. Both can get the same
-    // timestamp on a fast machine, then the random id decides, so space them apart.
-    await db.query(`update bookings set created_at = now() - interval '1 minute' where trip_id = $1 and user_id = $2`, [trip, ids.max]);
     await endInterest(trip);
     await as('anna', `select allocate_due_trips()`);
     expect(await statuses(trip)).toEqual({ max: 'confirmed', karl: 'waitlist', anna: 'confirmed' });
@@ -417,7 +423,9 @@ describe('change log', () => {
 
   it('logs what admins change, with their name', async () => {
     await db.query(`delete from audit_log`);
-    const trip = await addTrip(2);
+    // One hour instead of the 72 the trip starts with, so the end of the member phase really changes even
+    // when both statements fall into the same millisecond.
+    const trip = await addTrip(2, 1);
     await as('admin', `update trips set seats = 3 where id = $1`, [trip]);
     await as('admin', `insert into news (title, body) values ('Hallo', 'Welt')`);
     await as('admin', `update settings set interest_days = 1, max_companions = 0`);
