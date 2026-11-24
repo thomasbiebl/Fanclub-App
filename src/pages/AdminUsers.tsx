@@ -12,7 +12,7 @@ export function AdminUsers() {
   return (
     <>
       <h1 className="title">Benutzer</h1>
-      <div className="stack">
+      <div className="stack cards">
         {users.map((u) => {
           const self = u.id === me?.id;
           return (
