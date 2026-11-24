@@ -230,6 +230,9 @@ describe('companions, stops and buses', () => {
     await as('max', `select book_trip($1, 2)`, [trip]);   // 9 trips, needs 3
     await as('karl', `select book_trip($1, 2)`, [trip]);  // 9 trips, needs 3 -> does not fit
     await as('anna', `select book_trip($1, 0)`, [trip]);  // 5 trips, needs 1 -> fits
+    // Max and Karl tie on trips, so the earlier booking wins. Both can get the same
+    // timestamp on a fast machine, then the random id decides, so space them apart.
+    await db.query(`update bookings set created_at = now() - interval '1 minute' where trip_id = $1 and user_id = $2`, [trip, ids.max]);
     await endInterest(trip);
     await as('anna', `select allocate_due_trips()`);
     expect(await statuses(trip)).toEqual({ max: 'confirmed', karl: 'waitlist', anna: 'confirmed' });
