@@ -18,7 +18,7 @@ export function MyBookings() {
       <h1 className="title">Meine Buchungen</h1>
       <p className="muted">Bisherige Fahrten: <b>{pastTripCount(user, snap.trips, snap.bookings, now)}</b></p>
       {rows.length === 0 && <p className="notice">Du hast noch keine Fahrt gebucht. Schau bei den Fahrten vorbei.</p>}
-      <div className="stack">
+      <div className="stack cards">
         {rows.map(({ b, trip }) => (
           <Link key={b.id} to={`/trip/${trip.id}`} className="card trip">
             <div className="row between">

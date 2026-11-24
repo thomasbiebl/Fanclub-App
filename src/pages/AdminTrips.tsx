@@ -110,7 +110,7 @@ export function AdminTrips() {
         <button className="btn" onClick={() => setEditing('new')}>+ Neue Fahrt</button>
       )}
 
-      <div className="stack list">
+      <div className="stack list cards">
         {trips.map((t) => {
           const phase = getTripPhase(t, now);
           const list = byTrip(snap.bookings, t.id);
@@ -186,8 +186,8 @@ export function AdminTrips() {
             </section>
           );
         })}
-        <Link className="muted center" to="/admin">‹ Admin-Übersicht</Link>
       </div>
+      <Link className="muted center" to="/admin">‹ Admin-Übersicht</Link>
     </>
   );
 }

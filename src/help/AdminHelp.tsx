@@ -32,6 +32,7 @@ export function adminSections(s: Settings): HelpSection[] {
             <li><b>News verwalten</b>, <b>Einstellungen</b>, <b>Änderungsprotokoll</b>.</li>
           </ul>
           <p className="muted">Läuft die App im Demo-Modus (ohne Datenbank), liegen alle Daten nur im Browser dieses Geräts. Für den Echtbetrieb braucht es Supabase, siehe <code>docs/SUPABASE.md</code> im Repository.</p>
+          <p className="muted">Zum Vorführen hängst du <code>?demo</code> an die Adresse der App, z. B. <code>…/Fanclub-App/?demo</code>. Dann läuft die Demo mit erfundenen Daten und eigenen Demo-Zugängen, die echten Daten bleiben unberührt. Ein Balken oben zeigt den Demo-Modus an und führt zurück zur echten App.</p>
         </>
       ),
     },

@@ -55,6 +55,8 @@ Das Profil entsteht beim ersten Login automatisch, der Name kommt vom Anbieter. 
 
 Lokal: `.env.example` nach `.env.local` kopieren, Werte eintragen, `npm run dev`.
 
+**Demo zum Vorführen:** Hängst du `?demo` an die Adresse (z. B. `https://www.thomasbiebl.de/Fanclub-App/?demo`), läuft die App mit erfundenen Daten und den Demo-Zugängen, auch wenn Supabase eingerichtet ist. Die Demo-Daten liegen nur in diesem Browser, die echten Daten und die echte Anmeldung bleiben unberührt. Ein Balken oben zeigt den Demo-Modus an und führt zurück zur echten App.
+
 ## 5. Ersten Admin anlegen
 
 1. In der App ein Konto registrieren und die E-Mail bestätigen.

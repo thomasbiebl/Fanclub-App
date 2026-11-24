@@ -61,13 +61,13 @@ export function Trips() {
         </Link>
       )}
       {upcoming.length === 0 && <p className="muted">Zurzeit sind keine Fahrten geplant.</p>}
-      <div className="stack">
+      <div className="stack cards">
         {upcoming.map((t) => <TripCard key={t.id} trip={t} />)}
       </div>
       {past.length > 0 && (
         <>
           <h2 className="sub">Vergangene Fahrten <Badge>{past.length}</Badge></h2>
-          <div className="stack">{past.map((t) => <TripCard key={t.id} trip={t} />)}</div>
+          <div className="stack cards">{past.map((t) => <TripCard key={t.id} trip={t} />)}</div>
         </>
       )}
     </>
