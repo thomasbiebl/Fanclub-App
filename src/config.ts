@@ -1,12 +1,21 @@
 const url = import.meta.env.VITE_SUPABASE_URL as string | undefined;
 const anonKey = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined;
 
+/** `?demo` in the address, e.g. `…/Fanclub-App/?demo`, opens the demo even when Supabase is set up. */
+export const isDemoRequested = (search: string) => new URLSearchParams(search).has('demo');
+
 /**
- * With both variables set the app talks to Supabase. Without them it runs in demo mode and
- * keeps everything in this browser. The anon key is meant to be public; access is protected
- * by the row level security rules in supabase/migrations.
+ * True when Supabase is set up but `?demo` asked for the demo. The real data and the real login
+ * stay untouched; the demo keeps its own data in this browser.
  */
-export const supabaseConfig = url && anonKey ? { url, anonKey } : null;
+export const demoForced = Boolean(url && anonKey) && typeof location !== 'undefined' && isDemoRequested(location.search);
+
+/**
+ * With both variables set the app talks to Supabase. Without them, or with `?demo`, it runs in
+ * demo mode and keeps everything in this browser. The anon key is meant to be public; access is
+ * protected by the row level security rules in supabase/migrations.
+ */
+export const supabaseConfig = url && anonKey && !demoForced ? { url, anonKey } : null;
 
 export const OAUTH_PROVIDERS = ['google', 'apple', 'facebook'] as const;
 export type OAuthProvider = (typeof OAUTH_PROVIDERS)[number];

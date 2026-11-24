@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Navigate, Outlet, Route, Routes, useNavigate } from 'react-router-dom';
+import { DemoBanner } from './components/DemoBanner';
 import { Layout } from './components/Layout';
 import { Loading } from './components/Loading';
 import { AdminHome } from './pages/AdminHome';
@@ -45,6 +46,7 @@ export function App() {
   }, [clubName]);
   return (
     <>
+      <DemoBanner />
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
