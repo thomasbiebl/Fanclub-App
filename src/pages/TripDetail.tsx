@@ -4,12 +4,13 @@ import { Badge, Countdown, PhaseBadge, SeatBar, StatusBadge, fmtDate, fmtPrice, 
 import { buildIcs } from '../domain/ics';
 import { byTrip, cancelBlockedReason, confirmedCount, amountDue, fitsInOrder, freeSeats, getTripPhase, rankInterested, userScore, waitlistOf } from '../domain/rules';
 import { downloadFile } from '../lib/download';
+import { appUrl, share, tripShareData } from '../lib/share';
 import { HELP_LINKS } from '../help/sections';
 import { useApp } from '../state/AppContext';
 
 export function TripDetail() {
   const { id } = useParams();
-  const { snap, user, now, act, data } = useApp();
+  const { snap, user, now, act, data, notify } = useApp();
   const trip = snap?.trips.find((t) => t.id === id);
   const [companions, setCompanions] = useState(0);
   const [names, setNames] = useState('');
@@ -50,12 +51,15 @@ export function TripDetail() {
           <PhaseBadge phase={phase} />
           {phase === 'interest' && (
             <>
+              <p className="eyebrow">Mitglieder-Phase endet in</p>
               <Countdown ms={Date.parse(trip.interestEndsAt) - now} />
               <p className="muted">Danach werden die Plätze automatisch nach Punkten an die Interessenten vergeben. Freie Plätze können dann alle buchen. <Link to={HELP_LINKS.allocation}>Wie funktioniert die Vergabe?</Link></p>
             </>
           )}
           {phase === 'open' && (
             <>
+              <p className="eyebrow">Abfahrt in</p>
+              <Countdown ms={Date.parse(trip.departure) - now} />
               <SeatBar value={confirmed} max={trip.seats} full={free === 0} />
               <p className="muted">{free > 0 ? `Noch ${free} von ${trip.seats} Plätzen frei.` : `Ausgebucht. ${waitlist.length} auf der Warteliste.`}</p>
             </>
@@ -123,9 +127,17 @@ export function TripDetail() {
           </dl>
           {trip.notes && <p className="prose">{trip.notes}</p>}
           {phase !== 'cancelled' && (
-            <button className="chip" onClick={() => downloadFile(`busfahrt-${trip.title.replace(/\W+/g, '-').toLowerCase()}.ics`, buildIcs(trip), 'text/calendar;charset=utf-8')}>
-              Zum Kalender hinzufügen
-            </button>
+            <div className="chips">
+              <button className="chip" onClick={() => downloadFile(`busfahrt-${trip.title.replace(/\W+/g, '-').toLowerCase()}.ics`, buildIcs(trip), 'text/calendar;charset=utf-8')}>
+                Zum Kalender hinzufügen
+              </button>
+              {phase !== 'closed' && <button className="chip" onClick={() => void share(tripShareData(trip, appUrl())).then((r) => {
+                if (r === 'copied') notify('Link kopiert. Du kannst ihn jetzt z. B. in WhatsApp einfügen.');
+                if (r === 'failed') notify('Teilen hat nicht geklappt. Kopiere die Adresse aus der Adresszeile.');
+              })}>
+                Teilen
+              </button>}
+            </div>
           )}
         </section>
 

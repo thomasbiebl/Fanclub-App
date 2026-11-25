@@ -1,15 +1,16 @@
 # Offene Punkte
 
-Stand: 24. November 2026. Die Anleitungen zu jedem Punkt stehen in [SUPABASE.md](SUPABASE.md).
+Stand: 25. November 2026. Die Anleitungen zu jedem Punkt stehen in [SUPABASE.md](SUPABASE.md).
 
 ## Erledigt
 
 - [x] Supabase-Projekt **Fanclub-App** angelegt (Frankfurt, kostenlos, Projekt-ID `jzzkihubammmbjlfvxiz`)
-- [x] Migrationen `0001` bis `0009` eingespielt, automatische Platzvergabe (`pg_cron`) läuft alle 5 Minuten
+- [x] Migrationen `0001` bis `0010` eingespielt, automatische Platzvergabe (`pg_cron`) läuft alle 5 Minuten
 - [x] GitHub-Variablen `SUPABASE_URL` und `SUPABASE_ANON_KEY` gesetzt, App läuft mit Supabase
 - [x] Anmeldung mit Bestätigungsmail über Brevo (SMTP)
 - [x] Erster Admin angelegt
 - [x] PC-Ansicht und Demo-Modus (`?demo`) online
+- [x] Teilen, Countdown, Ladeanzeige, persönliche Statistik, Fahrt kopieren, Nachricht an Mitfahrer
 
 ## Offen
 
@@ -17,9 +18,21 @@ Stand: 24. November 2026. Die Anleitungen zu jedem Punkt stehen in [SUPABASE.md]
 - [ ] **Backup einrichten** (SUPABASE.md, Schritt 6). In GitHub die Secrets `SUPABASE_DB_URL` (Verbindung „Session pooler“ mit Datenbank-Passwort) und `BACKUP_PASSPHRASE` anlegen. Der kostenlose Tarif hat sonst keine Sicherung.
 - [ ] **E-Mail-Benachrichtigungen** (SUPABASE.md, Schritt 7). Edge Function `notify-email` bereitstellen, Secrets setzen (`BREVO_API_KEY`, `MAIL_FROM`, `MAIL_FROM_NAME`, `APP_URL=https://www.thomasbiebl.de/Fanclub-App/`, `WEBHOOK_SECRET`) und den Webhook auf die Tabelle `notifications` anlegen. Danach mit einer abgesagten Fahrt testen.
 - [ ] **Datenschutz.** Impressum und Datenschutzerklärung erstellen, den Auftragsverarbeitungsvertrag in Supabase abschließen (*Organization Settings → Legal*). Muss vor dem Start mit echten Mitgliedern erledigt sein.
-- [ ] **Kleine Sicherheits-Nachbesserung** (Migration `0010`). Die Sicherheitsprüfung von Supabase meldet zwei Kleinigkeiten:
+- [ ] **Kleine Sicherheits-Nachbesserung** (Migration `0011`). Die Sicherheitsprüfung von Supabase meldet zwei Kleinigkeiten:
   - Interne Hilfsfunktionen (z. B. `trips_audit`, `news_after_insert`) sind ohne Anmeldung aufrufbar. Sie brechen dann zwar nur ab, die Rechte sollten trotzdem entzogen werden.
   - Bei der Funktion `fmt_departure` fehlt `search_path`.
   Danach die Sicherheitsprüfung erneut laufen lassen.
 - [ ] **Mitglieder aufnehmen.** Mitgliederliste unter *Admin → Mitgliederliste importieren* einfügen oder unter *Admin → Einstellungen* einen Mitgliedscode festlegen.
 - [ ] **Vereinsdesigns prüfen.** Auf dem Branch `ccr-b02d1229-m24ee1` liegen Designs für die 1. und 2. Bundesliga, die noch nicht in `master` sind. Entscheiden, ob sie übernommen werden.
+
+## Ideen für später
+
+Aus der Feature-Liste vom 24. November 2026, noch nicht umgesetzt:
+
+- [ ] Erinnerung am Vortag der Abfahrt (Mitteilung und Mail an alle mit Platz)
+- [ ] Einchecken am Bus per QR-Code
+- [ ] Farbband oder Bild des Gegners auf jeder Fahrt
+- [ ] Online bezahlen (PayPal-Link oder Überweisungs-QR-Code)
+- [ ] Platz an eine bestimmte Person übertragen
+- [ ] Kassenübersicht pro Saison
+- [ ] Gefahrene Kilometer in der Statistik (braucht eine Entfernung pro Fahrt)

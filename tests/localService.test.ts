@@ -126,6 +126,21 @@ describe('admin cancels a booking in the demo', () => {
     expect((await svc.adminCancelBooking('gibt-es-nicht')).ok).toBe(false);
   });
 
+  it('sends a message to the passengers of a trip and logs it', async () => {
+    loggedInAs('admin');
+    const svc = new LocalStorageService();
+    expect(await svc.messageTrip('dortmund', ' Bus steht am Hintereingang ', false)).toEqual({ ok: true, sent: 3 });
+    let snap = await svc.load();
+    const msgs = snap.notifications.filter((n) => n.type === 'trip_message');
+    expect(msgs.map((n) => n.userId).sort()).toEqual(['anna', 'max', 'sophie']);
+    expect(msgs[0]).toMatchObject({ title: 'Info zur Fahrt: Dortmund (A)', body: 'Bus steht am Hintereingang', tripId: 'dortmund' });
+    expect(await svc.messageTrip('dortmund', 'Alle', true)).toEqual({ ok: true, sent: 4 });
+    snap = await svc.load();
+    expect(snap.audit.map((e) => `${e.action}:${e.detail}:${e.actorName}`)).toEqual(['trip_message:Dortmund (A): an 4 Personen:Admin', 'trip_message:Dortmund (A): an 3 Personen:Admin']);
+    const empty = await svc.messageTrip('dortmund', '  ', false);
+    expect(empty.ok ? '' : empty.error).toMatch(/Nachricht eingeben/);
+  });
+
   it('does not log or announce a person cancelling their own booking', async () => {
     loggedInAs('max');
     const svc = new LocalStorageService();

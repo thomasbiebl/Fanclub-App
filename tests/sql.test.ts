@@ -596,3 +596,39 @@ describe('access control', () => {
     await db.exec(`reset role`);
   });
 });
+
+describe('message to the passengers of a trip', () => {
+  const messages = () => db.query<{ user_id: string; type: string; title: string; body: string }>(`select user_id, type, title, body from notifications where type = 'trip_message'`).then((r) => r.rows);
+  const fullTrip = async () => {
+    const trip = await addTrip(2, 0);
+    await endInterest(trip);
+    await as('anna', `select book_trip($1)`, [trip]);
+    await as('max', `select book_trip($1)`, [trip]);
+    await as('karl', `select book_trip($1)`, [trip]); // waiting list
+    return trip;
+  };
+
+  it('reaches confirmed passengers, with the option also waiting list and interest, and logs it', async () => {
+    const trip = await fullTrip();
+    const res = await as<{ admin_message_trip: number }>('admin', `select admin_message_trip($1, $2, false)`, [trip, '  Bus steht am Hintereingang  ']);
+    expect(res[0]!.admin_message_trip).toBe(2);
+    const rows = await messages();
+    expect(rows.map((r) => r.user_id).sort()).toEqual([ids.anna, ids.max].sort());
+    expect(rows[0]).toMatchObject({ title: 'Info zur Fahrt: Augsburg', body: 'Bus steht am Hintereingang' });
+    const all = await as<{ admin_message_trip: number }>('admin', `select admin_message_trip($1, 'Nochmal', true)`, [trip]);
+    expect(all[0]!.admin_message_trip).toBe(3);
+    const log = (await db.query<{ action: string; detail: string }>(`select action, detail from audit_log where action = 'trip_message' order by id`)).rows;
+    expect(log.map((r) => r.detail)).toEqual(['Augsburg: an 2 Personen', 'Augsburg: an 3 Personen']);
+  });
+
+  it('lets only admins send, and refuses empty, too long or unreachable messages', async () => {
+    const trip = await fullTrip();
+    expect(await asErr('anna', `select admin_message_trip($1, 'Hallo', false)`, [trip])).toMatch(/Admins/);
+    expect(await asErr('admin', `select admin_message_trip($1, '   ', false)`, [trip])).toMatch(/Nachricht eingeben/);
+    expect(await asErr('admin', `select admin_message_trip($1, $2, false)`, [trip, 'x'.repeat(1001)])).toMatch(/zu lang/);
+    expect(await asErr('admin', `select admin_message_trip(gen_random_uuid(), 'Hallo', false)`)).toMatch(/nicht gefunden/);
+    const empty = await addTrip(2);
+    expect(await asErr('admin', `select admin_message_trip($1, 'Hallo', true)`, [empty])).toMatch(/niemanden/);
+    expect(await messages()).toEqual([]);
+  });
+});

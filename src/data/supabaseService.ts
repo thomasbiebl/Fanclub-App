@@ -140,6 +140,11 @@ export class SupabaseService implements DataService {
   adminCancelBooking: DataService['adminCancelBooking'] = async (bookingId) =>
     fail((await this.sb.rpc('admin_cancel_booking', { p_booking: bookingId })).error);
 
+  messageTrip: DataService['messageTrip'] = async (tripId, body, everyone) => {
+    const { data, error } = await this.sb.rpc('admin_message_trip', { p_trip: tripId, p_body: body, p_everyone: everyone });
+    return error ? { ok: false, error: error.message } : { ok: true, sent: Number(data) || 0 };
+  };
+
   setBookingPaid: DataService['setBookingPaid'] = async (bookingId, paid) =>
     fail((await this.sb.rpc('admin_set_booking_paid', { p_booking: bookingId, p_paid: paid })).error);
 

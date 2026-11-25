@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
-import { Badge, PhaseBadge, SeatBar, StatusBadge, fmtDate, fmtPrice } from '../components/ui';
-import { confirmedCount, freeSeats, getTripPhase, waitlistOf, byTrip } from '../domain/rules';
+import { Badge, Countdown, PhaseBadge, SeatBar, StatusBadge, fmtDate, fmtPrice } from '../components/ui';
+import { confirmedCount, departureHint, freeSeats, getTripPhase, waitlistOf, byTrip } from '../domain/rules';
 import type { Trip } from '../domain/types';
 import { useApp } from '../state/AppContext';
 import { fmtDay, sortNews } from './News';
@@ -38,22 +38,37 @@ function TripCard({ trip }: { trip: Trip }) {
         {mine && <StatusBadge status={mine.status} />}
       </div>
       <h3>{trip.title}</h3>
-      <div className="muted">{fmtDate(trip.departure)} · {fmtPrice(trip.price)}</div>
+      <div className="muted">{fmtDate(trip.departure)} · {fmtPrice(trip.price)}{phase !== 'cancelled' && departureHint(trip.departure, now) ? ` · ${departureHint(trip.departure, now)}` : ''}</div>
       <SeatBar value={value} max={trip.seats} full={phase !== 'interest' && free === 0} />
       <div className="muted">{info}</div>
     </Link>
   );
 }
 
+/** The user's next trip with a confirmed seat, big and with a countdown. */
+function NextTrip({ trip }: { trip: Trip }) {
+  const { now } = useApp();
+  return (
+    <Link to={`/trip/${trip.id}`} className="card next-trip">
+      <span className="eyebrow">Deine nächste Fahrt</span>
+      <h3>{trip.title}</h3>
+      <div className="muted">{fmtDate(trip.departure)}</div>
+      <Countdown ms={Date.parse(trip.departure) - now} />
+    </Link>
+  );
+}
+
 export function Trips() {
-  const { snap, now } = useApp();
+  const { snap, user, now } = useApp();
   if (!snap) return null;
   const upcoming = snap.trips.filter((t) => Date.parse(t.departure) > now).sort((a, b) => a.departure.localeCompare(b.departure));
   const latestNews = sortNews(snap.news)[0];
   const past = snap.trips.filter((t) => Date.parse(t.departure) <= now).sort((a, b) => b.departure.localeCompare(a.departure));
+  const next = upcoming.find((t) => !t.cancelledAt && snap.bookings.some((b) => b.tripId === t.id && b.userId === user?.id && b.status === 'confirmed'));
   return (
     <>
       <h1 className="title">Bus<span className="accent-text">fahrten</span></h1>
+      {next && <NextTrip trip={next} />}
       {latestNews && (
         <Link to="/news" className="card news-teaser">
           <span className="muted">News · {fmtDay(latestNews.createdAt)}</span>

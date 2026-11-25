@@ -1,6 +1,6 @@
 import { DEFAULT_SETTINGS, type Snapshot, type Trip, type User } from '../domain/types';
 import { deriveAudit } from '../domain/audit';
-import { deriveNotifications } from '../domain/notifications';
+import { deriveNotifications, tripMessageError, tripMessageRecipients } from '../domain/notifications';
 import { adminCancelBlockedReason, allocateAll, allocateTrip, cancelBlockedReason, createBooking, getTripPhase, interestEndFor, promoteWaitlist, validateSettings } from '../domain/rules';
 import type { DataService, Result, TripInput } from './DataService';
 import { buildSeed } from './seed';
@@ -221,6 +221,25 @@ export class LocalStorageService implements DataService {
       if (blocked) return blocked;
       return { ...s, bookings: promoteWaitlist(s.bookings.filter((b) => b.id !== bookingId), trip) };
     });
+
+  messageTrip: DataService['messageTrip'] = async (tripId, body, everyone) => {
+    let sent = 0;
+    const res = await this.mutate((s, now) => {
+      const trip = s.trips.find((t) => t.id === tripId);
+      if (!trip) return 'Fahrt nicht gefunden.';
+      const error = tripMessageError(body);
+      if (error) return error;
+      const to = tripMessageRecipients(s.bookings, tripId, everyone);
+      if (to.length === 0) return 'Bei dieser Fahrt gibt es niemanden, der die Nachricht bekommen würde.';
+      sent = to.length;
+      const at = new Date(now).toISOString();
+      const fresh = to.map((userId) => ({ id: uid(), userId, type: 'trip_message' as const, title: `Info zur Fahrt: ${trip.title}`, body: body.trim(), tripId, createdAt: at }));
+      const actor = s.users.find((u) => u.id === sessionUserId());
+      const entry = { id: uid(), at, actorId: actor?.id ?? '', actorName: actor?.name ?? 'System', action: 'trip_message' as const, detail: `${trip.title}: an ${sent} ${sent === 1 ? 'Person' : 'Personen'}` };
+      return { ...s, notifications: [...fresh, ...s.notifications].slice(0, 500), audit: [entry, ...s.audit].slice(0, 500) };
+    });
+    return res.ok ? { ok: true, sent } : res;
+  };
 
   setBookingPaid: DataService['setBookingPaid'] = (bookingId, paid) =>
     this.mutate((s) =>

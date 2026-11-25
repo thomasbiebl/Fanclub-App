@@ -2,8 +2,10 @@ import { useState, type FormEvent } from 'react';
 import { Link } from 'react-router-dom';
 import { PhaseBadge, StatusBadge, fmtDate } from '../components/ui';
 import type { TripInput } from '../data/DataService';
-import { byTrip, confirmedCount, getTripPhase, pastTripCount } from '../domain/rules';
+import { TRIP_MESSAGE_MAX, tripMessageRecipients } from '../domain/notifications';
+import { byTrip, confirmedCount, addWeeks, copyWeeks, getTripPhase, pastTripCount } from '../domain/rules';
 import type { Settings, Trip } from '../domain/types';
+import { scrollToTop } from '../lib/scroll';
 import { useApp } from '../state/AppContext';
 
 const pad = (n: number) => String(n).padStart(2, '0');
@@ -20,7 +22,14 @@ const emptyForm = (s: Settings): FormState => {
   return { title: '', departure: toLocalInput(d.toISOString()), meetingPoint: s.defaultMeetingPoint, price: String(s.defaultPrice), seats: String(s.defaultSeats), kickoff: '', returnTime: '', notes: '', stops: '', buses: '1', points: '1' };
 };
 
-function TripForm({ initial, onSubmit, onCancel }: { initial: FormState; onSubmit: (i: TripInput) => void; onCancel: () => void }) {
+const formFromTrip = (t: Trip, weeks = 0): FormState => {
+  const shift = (iso?: string) => (iso ? toLocalInput(addWeeks(iso, weeks)) : '');
+  return { title: t.title, departure: shift(t.departure), meetingPoint: t.meetingPoint, price: String(t.price), seats: String(t.seats), kickoff: shift(t.kickoff), returnTime: shift(t.returnTime), notes: t.notes, stops: t.stops.join('\n'), buses: String(t.buses), points: String(t.points) };
+};
+
+type Editing = { mode: 'new' } | { mode: 'edit'; trip: Trip } | { mode: 'copy'; trip: Trip };
+
+function TripForm({ heading, initial, onSubmit, onCancel }: { heading: string; initial: FormState; onSubmit: (i: TripInput) => void; onCancel: () => void }) {
   const [f, setF] = useState(initial);
   const set = (k: keyof FormState) => (e: { target: { value: string } }) => setF({ ...f, [k]: e.target.value });
   const submit = (e: FormEvent) => {
@@ -41,6 +50,7 @@ function TripForm({ initial, onSubmit, onCancel }: { initial: FormState; onSubmi
   };
   return (
     <form className="card form" onSubmit={submit}>
+      <h3>{heading}</h3>
       <label htmlFor="t-title">Titel</label>
       <input id="t-title" required placeholder="z. B. Augsburg (A)" value={f.title} onChange={set('title')} />
       <label htmlFor="t-dep">Abfahrt</label>
@@ -82,8 +92,11 @@ function TripForm({ initial, onSubmit, onCancel }: { initial: FormState; onSubmi
 }
 
 export function AdminTrips() {
-  const { snap, now, act, data } = useApp();
-  const [editing, setEditing] = useState<Trip | 'new' | null>(null);
+  const { snap, now, act, data, notify } = useApp();
+  const [editing, setEditing] = useState<Editing | null>(null);
+  const [messageId, setMessageId] = useState<string | null>(null);
+  const [message, setMessage] = useState('');
+  const [everyone, setEveryone] = useState(false);
   const [open, setOpen] = useState<string | null>(null);
   const [confirmId, setConfirmId] = useState<string | null>(null);
   const [cancelId, setCancelId] = useState<string | null>(null);
@@ -102,12 +115,14 @@ export function AdminTrips() {
       <h1 className="title">Fahrten</h1>
       {editing ? (
         <TripForm
-          initial={editing === 'new' ? emptyForm(snap.settings) : { title: editing.title, departure: toLocalInput(editing.departure), meetingPoint: editing.meetingPoint, price: String(editing.price), seats: String(editing.seats), kickoff: editing.kickoff ? toLocalInput(editing.kickoff) : '', returnTime: editing.returnTime ? toLocalInput(editing.returnTime) : '', notes: editing.notes, stops: editing.stops.join('\n'), buses: String(editing.buses), points: String(editing.points) }}
-          onSubmit={(i) => void save(editing === 'new' ? null : editing.id, i)}
+          key={editing.mode === 'new' ? 'new' : `${editing.mode}-${editing.trip.id}`}
+          heading={editing.mode === 'new' ? 'Neue Fahrt' : editing.mode === 'edit' ? 'Fahrt bearbeiten' : `Kopie von ${editing.trip.title}`}
+          initial={editing.mode === 'new' ? emptyForm(snap.settings) : editing.mode === 'edit' ? formFromTrip(editing.trip) : formFromTrip(editing.trip, copyWeeks(editing.trip.departure, now))}
+          onSubmit={(i) => void save(editing.mode === 'edit' ? editing.trip.id : null, i)}
           onCancel={() => setEditing(null)}
         />
       ) : (
-        <button className="btn" onClick={() => setEditing('new')}>+ Neue Fahrt</button>
+        <button className="btn" onClick={() => setEditing({ mode: 'new' })}>+ Neue Fahrt</button>
       )}
 
       <div className="stack list cards">
@@ -126,7 +141,9 @@ export function AdminTrips() {
               <div className="chips">
                 <button className="chip" onClick={() => setOpen(isOpen ? null : t.id)}>{isOpen ? 'Teilnehmer ausblenden' : 'Teilnehmer'}</button>
                 <Link className="chip" to={`/admin/trips/${t.id}/list`}>Liste &amp; Kasse</Link>
-                <button className="chip" onClick={() => setEditing(t)}>Bearbeiten</button>
+                <button className="chip" onClick={() => setEditing({ mode: 'edit', trip: t })}>Bearbeiten</button>
+                <button className="chip" onClick={() => { setEditing({ mode: 'copy', trip: t }); scrollToTop(); }}>Kopieren</button>
+                <button className="chip" onClick={() => { setMessageId(messageId === t.id ? null : t.id); setMessage(''); setEveryone(false); }}>Nachricht an Mitfahrer</button>
                 {phase === 'interest' && <button className="chip" onClick={() => void act(() => data.endInterestNow(t.id), 'Plätze vergeben.')}>Interessensphase beenden</button>}
                 {(phase === 'interest' || phase === 'open') && <button className="chip" onClick={() => { setCancelId(cancelId === t.id ? null : t.id); setReason(''); }}>Fahrt absagen</button>}
                 {confirmId === t.id ? (
@@ -138,6 +155,30 @@ export function AdminTrips() {
                   <button className="chip" onClick={() => setConfirmId(t.id)}>Löschen</button>
                 )}
               </div>
+              {messageId === t.id && (() => {
+                const count = tripMessageRecipients(snap.bookings, t.id, everyone).length;
+                const send = async () => {
+                  const res = await data.messageTrip(t.id, message, everyone);
+                  if (!res.ok) return notify(res.error);
+                  setMessageId(null);
+                  await act(async () => ({ ok: true }), `Nachricht an ${res.sent} ${res.sent === 1 ? 'Person' : 'Personen'} geschickt.`);
+                };
+                return (
+                  <div className="form">
+                    <label htmlFor={`m-${t.id}`}>Nachricht (kommt als Mitteilung „Info zur Fahrt“, auf Wunsch auch per Mail)</label>
+                    <textarea id={`m-${t.id}`} rows={3} maxLength={TRIP_MESSAGE_MAX} placeholder="z. B. Der Bus steht heute am Hintereingang." value={message} onChange={(e) => setMessage(e.target.value)} />
+                    <label className="check" htmlFor={`m-all-${t.id}`}>
+                      <input id={`m-all-${t.id}`} type="checkbox" checked={everyone} onChange={(e) => setEveryone(e.target.checked)} />
+                      Auch an Warteliste und Interessenten
+                    </label>
+                    <p className="muted">Geht an {count} {count === 1 ? 'Person' : 'Personen'}.</p>
+                    <div className="chips">
+                      <button className="chip danger" disabled={count === 0 || !message.trim()} onClick={() => void send()}>Nachricht senden</button>
+                      <button className="chip" onClick={() => setMessageId(null)}>Abbrechen</button>
+                    </div>
+                  </div>
+                );
+              })()}
               {cancelId === t.id && (
                 <div className="form">
                   <label htmlFor={`c-${t.id}`}>Grund der Absage (optional, sehen alle)</label>

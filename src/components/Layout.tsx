@@ -42,7 +42,7 @@ export function Layout({ children }: { children?: ReactNode }) {
           </span>
         </div>
       </header>
-      <main className="page">
+      <main className="page" key={pathname}>
         {children ?? <Outlet />}
       </main>
       <nav className="tabs" aria-label="Hauptnavigation">

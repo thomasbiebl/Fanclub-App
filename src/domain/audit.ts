@@ -22,6 +22,7 @@ export const AUDIT_LABEL: Record<AuditAction, string> = {
   roster_imported: 'Mitgliederliste importiert',
   roster_cleared: 'Mitgliederliste geleert',
   member_code_changed: 'Mitgliedscode',
+  trip_message: 'Nachricht an Mitfahrer',
 };
 
 const SETTING_LABEL: [keyof Settings, string][] = [

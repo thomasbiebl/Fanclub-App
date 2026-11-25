@@ -87,7 +87,7 @@ export type AuditAction =
   | 'news_created' | 'news_updated' | 'news_deleted' | 'settings_changed'
   | 'member_changed' | 'admin_changed' | 'points_changed' | 'user_deleted'
   | 'booking_paid' | 'booking_attended' | 'booking_bus' | 'booking_removed'
-  | 'roster_imported' | 'roster_cleared' | 'member_code_changed';
+  | 'roster_imported' | 'roster_cleared' | 'member_code_changed' | 'trip_message';
 
 export interface AuditEntry {
   id: string;
@@ -98,7 +98,7 @@ export interface AuditEntry {
   detail: string;
 }
 
-export type NotificationType = 'allocated' | 'waitlisted' | 'promoted' | 'trip_cancelled' | 'booking_removed' | 'new_trip' | 'news';
+export type NotificationType = 'allocated' | 'waitlisted' | 'promoted' | 'trip_cancelled' | 'booking_removed' | 'trip_message' | 'new_trip' | 'news';
 
 export interface Notification {
   id: string;
