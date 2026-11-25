@@ -1,7 +1,23 @@
 import type { Booking, Notification, NotificationType, Snapshot, Trip } from './types';
 
 /** Types that concern one person directly. Everything else goes to all users. */
-export const PERSONAL_TYPES: NotificationType[] = ['allocated', 'waitlisted', 'promoted', 'trip_cancelled', 'booking_removed'];
+export const PERSONAL_TYPES: NotificationType[] = ['allocated', 'waitlisted', 'promoted', 'trip_cancelled', 'booking_removed', 'trip_message'];
+
+/** Longest message an admin can send to the passengers of a trip. */
+export const TRIP_MESSAGE_MAX = 1000;
+
+/** Who gets a message to a trip: people with a confirmed seat, with `everyone` also waiting list and interest. */
+export function tripMessageRecipients(bookings: Booking[], tripId: string, everyone: boolean): string[] {
+  return [...new Set(bookings.filter((b) => b.tripId === tripId && (everyone || b.status === 'confirmed')).map((b) => b.userId))];
+}
+
+/** Error for an empty or too long message, null when it is fine. Same rules as admin_message_trip in the database. */
+export function tripMessageError(body: string): string | null {
+  const msg = body.trim();
+  if (!msg) return 'Bitte eine Nachricht eingeben.';
+  if (msg.length > TRIP_MESSAGE_MAX) return `Die Nachricht ist zu lang (höchstens ${TRIP_MESSAGE_MAX} Zeichen).`;
+  return null;
+}
 
 const when = (iso: string) =>
   new Date(iso).toLocaleString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) + ' Uhr';

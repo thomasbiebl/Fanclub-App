@@ -20,6 +20,34 @@ button, input { font: inherit; color: inherit; }
 .link { background: none; border: 0; padding: 4px 0; cursor: pointer; }
 .page { flex: 1; padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 14px; }
 .loading { padding: 40px 16px; text-align: center; color: var(--muted); }
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* Page change: the new page fades in softly. */
+.shell > .page { animation: page-in 0.18s ease-out; }
+@keyframes page-in { from { opacity: 0; transform: translateY(6px); } }
+
+/* Loading placeholders in the shape of the trip list. */
+.skeleton .page { padding-top: 24px; }
+.sk { display: block; border-radius: 8px; background: linear-gradient(90deg, var(--surface-2) 25%, var(--surface) 50%, var(--surface-2) 75%); background-size: 200% 100%; animation: sk-shine 1.2s linear infinite; }
+.sk-line { height: 12px; width: 40%; }
+.sk-title { height: 30px; width: 55%; }
+.sk-badge { height: 20px; width: 120px; border-radius: 99px; }
+.sk-text { height: 18px; width: 65%; }
+.sk-bar { height: 10px; width: 100%; margin-top: 6px; }
+.sk-card { gap: 10px; }
+@keyframes sk-shine { to { background-position: -200% 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .shell > .page, .sk { animation: none; }
+}
+
+.next-trip { border-color: var(--highlight-border); }
+.next-trip .count { margin-bottom: 0; }
+.chip:disabled { opacity: 0.5; cursor: default; }
+.badges { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.trophy { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 99px; border: 1px solid var(--border); background: var(--surface-2); font-weight: 700; font-variant-numeric: tabular-nums; }
+.trophy[data-on='false'] { color: var(--muted); font-weight: 400; }
+.trophy[data-on='true'] { border-color: var(--primary); }
 
 .title { font-size: 26px; font-weight: var(--title-weight); letter-spacing: 0.2px; text-wrap: balance; }
 .sub { font-size: 17px; font-weight: 700; display: flex; align-items: center; gap: 8px; }
@@ -37,6 +65,7 @@ button, input { font: inherit; color: inherit; }
 }
 .card h3 { font-size: 17px; }
 a.card { color: inherit; text-decoration: none; }
+.card > .badge { align-self: flex-start; }
 .card.hot { border-color: var(--highlight-border); box-shadow: 0 0 0 1px var(--highlight-border) inset; }
 .card.past { opacity: 0.7; }
 .notice { background: var(--surface); border: 1px dashed var(--border); border-radius: var(--radius-sm); padding: 12px 14px; font-size: 14px; }

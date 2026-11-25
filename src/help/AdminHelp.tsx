@@ -123,7 +123,7 @@ export function adminSections(s: Settings): HelpSection[] {
     {
       id: 'fahrten',
       title: 'Fahrten anlegen und verwalten',
-      keywords: 'fahrt anlegen bearbeiten absagen löschen zustiegsstellen busse hinweise anstoß rückfahrt interessensphase beenden',
+      keywords: 'fahrt anlegen bearbeiten kopieren vorlage absagen löschen zustiegsstellen busse hinweise anstoß rückfahrt interessensphase beenden nachricht mitfahrer info',
       body: (
         <>
           <p><b>Admin → Fahrten verwalten → + Neue Fahrt.</b> Die Vorgaben (Plätze, Preis, Treffpunkt) kommen aus den Einstellungen.</p>
@@ -144,6 +144,8 @@ export function adminSections(s: Settings): HelpSection[] {
           </div>
           <ul>
             <li><b>Bearbeiten</b> ändert die Felder, nicht die Vorrang-Frist und nicht die Buchungen.</li>
+            <li><b>Kopieren</b> legt eine neue Fahrt mit denselben Angaben an: Preis, Plätze, Treffpunkt, Zustiegsstellen, Busse, Punkte und Hinweise. Abfahrt, Anstoß und Rückfahrt rücken um ganze Wochen vor, bis sie in der Zukunft liegen, Wochentag und Uhrzeit bleiben. Passe Titel und Datum an und speichere. Buchungen werden nicht übernommen, die Vorrang-Zeit beginnt neu.</li>
+            <li><b>Nachricht an Mitfahrer</b> schickt allen mit bestätigtem Platz eine Mitteilung „Info zur Fahrt“, z. B. „Der Bus steht heute am Hintereingang“. Mit dem Haken geht sie auch an Warteliste und Interessenten. Vor dem Senden steht, wie viele Personen sie bekommen. Wer persönliche E-Mails eingeschaltet hat, bekommt sie auch per Mail. Im Änderungsprotokoll steht, wann sie an wie viele ging. Für alle Mitglieder sind weiter die <b>News</b> da.</li>
             <li><b>Fahrt absagen</b> mit Grund: sieh Abschnitt Buchungslogik. <b>Löschen</b> entfernt alles.</li>
             <li><b>Teilnehmer</b> zeigt eine Schnellansicht, <b>Liste &amp; Kasse</b> die volle Verwaltung.</li>
           </ul>
@@ -244,7 +246,7 @@ export function adminSections(s: Settings): HelpSection[] {
       body: (
         <>
           <h4>Änderungsprotokoll</h4>
-          <p>Unter <b>Admin → Änderungsprotokoll</b> stehen die letzten Änderungen mit Datum und Name: Fahrten (angelegt, geändert, abgesagt, gelöscht, Vorrang beendet), News, Einstellungen, Mitgliedschaften, Admin-Rechte, Startwerte, gelöschte Konten, Listenimport und Zahlungs-, Einstiegs- und Bus-Markierungen sowie von Admins stornierte Buchungen. Der Mitgliedscode selbst steht nicht im Protokoll.</p>
+          <p>Unter <b>Admin → Änderungsprotokoll</b> stehen die letzten Änderungen mit Datum und Name: Fahrten (angelegt, geändert, abgesagt, gelöscht, Vorrang beendet), News, Einstellungen, Mitgliedschaften, Admin-Rechte, Startwerte, gelöschte Konten, Listenimport und Zahlungs-, Einstiegs- und Bus-Markierungen, von Admins stornierte Buchungen sowie Nachrichten an Mitfahrer (an wie viele Personen, nicht der Text). Der Mitgliedscode selbst steht nicht im Protokoll.</p>
           <p>Nicht protokolliert werden die automatische Platzvergabe und Buchungen oder Stornierungen der Mitglieder selbst.</p>
           <h4>Datenschutz</h4>
           <ul>
@@ -270,6 +272,10 @@ export function adminSections(s: Settings): HelpSection[] {
           <p>Setze den Vorlauf in den Einstellungen auf 0. Das gilt für Fahrten, die du danach anlegst. Bei einer bestehenden Fahrt hilft „Interessensphase beenden“.</p>
           <h4>Jemand will nach Ablauf der Stornofrist noch absagen, oder ein Platz muss frei werden</h4>
           <p>Öffne <b>Liste &amp; Kasse</b> der Fahrt und tippe bei der Person auf <b>Stornieren</b>, dann auf <b>Wirklich stornieren</b>. Die Stornofrist gilt für Admins nicht. Die Person bekommt eine Mitteilung, die Warteliste rückt nach. Nach der Abfahrt geht das nicht mehr.</p>
+          <h4>Der Treffpunkt oder die Abfahrtszeit ändert sich kurzfristig</h4>
+          <p>Ändere die Fahrt (Bearbeiten) und schicke danach über <b>Nachricht an Mitfahrer</b> eine kurze Info. Das Bearbeiten allein benachrichtigt niemanden.</p>
+          <h4>Die nächste Auswärtsfahrt ist fast wie die letzte</h4>
+          <p>Bei der letzten Fahrt auf <b>Kopieren</b> tippen, Titel und Datum ändern, speichern.</p>
           <h4>Jemand hat nicht gezahlt oder ist nicht erschienen</h4>
           <p>Lasse „bezahlt“ offen, in <b>Liste &amp; Kasse</b> siehst du alle offenen Beträge. Markiere Nichterscheinen mit „fehlt“, das wirkt auf die Punkte bei der nächsten Vergabe.</p>
           <h4>Die Vergabe scheint falsch</h4>

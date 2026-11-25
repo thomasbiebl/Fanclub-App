@@ -83,11 +83,12 @@ describe('SupabaseService', () => {
     await svc.setBookingBus('b1', 2);
     await svc.setBookingPaid('b1', true);
     await svc.adminCancelBooking('b1');
+    await svc.messageTrip('t1', 'Hallo', true);
     await svc.setBookingAttendance('b1', null);
     await svc.updateMyName('u1', 'Neu');
     await svc.deleteMyAccount('u1');
     const rpcs = calls.filter((c) => c.startsWith('rpc ')).map((c) => /^rpc (\w+) (.*)$/.exec(c)!);
-    expect(rpcs.length).toBe(16);
+    expect(rpcs.length).toBe(17);
     for (const [, fn, args] of rpcs) {
       const decl = [...migration.matchAll(new RegExp(`create function public\\.${fn}\\(([^)]*)\\)`, 'g'))].at(-1);
       expect(decl, `function ${fn} exists in migration`).not.toBeNull();

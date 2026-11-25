@@ -3,6 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { Badge } from '../components/ui';
 import { buildMyExport } from '../domain/exports';
 import { noShowCount, pastTripCount, userScore } from '../domain/rules';
+import { BADGES, tripStats } from '../domain/stats';
 import { downloadFile } from '../lib/download';
 import { HELP_LINKS } from '../help/sections';
 import { useApp } from '../state/AppContext';
@@ -70,6 +71,8 @@ export function Profile() {
             {noShowCount(user, snap.trips, snap.bookings, now) > 0 && ` · Nicht erschienen: ${noShowCount(user, snap.trips, snap.bookings, now)}`}
           </p>
         </section>
+
+        <TripStatsCard />
 
         {!user.isMember && (
           <form className="card form" onSubmit={async (e) => { e.preventDefault(); if (await act(() => data.redeemMemberCode(user.id, code), 'Willkommen bei den Mitgliedern!')) setCode(''); }}>
@@ -155,5 +158,41 @@ export function Profile() {
         </section>
       </div>
     </>
+  );
+}
+
+/** Trips per season and badges at 10, 25, 50 and 100 trips. */
+function TripStatsCard() {
+  const { snap, user, now } = useApp();
+  if (!snap || !user) return null;
+  const stats = tripStats(user, snap.trips, snap.bookings, now);
+  const older = stats.seasons.filter((s) => s.season !== stats.season);
+  return (
+    <section className="card">
+      <h3>Deine Statistik</h3>
+      <div className="kpi">
+        <div><b>{stats.total}</b><span>Fahrten insgesamt</span></div>
+        <div><b>{stats.seasonCount}</b><span>in der Saison {stats.season}</span></div>
+      </div>
+      <div className="badges" role="list" aria-label="Abzeichen">
+        {BADGES.map((b) => {
+          const on = stats.earned.includes(b);
+          return (
+            <span key={b} role="listitem" className="trophy" data-on={on} aria-label={`${b} Fahrten${on ? ', erreicht' : ', noch nicht erreicht'}`}>
+              <b aria-hidden="true">{on ? '🏆' : '🔒'}</b>
+              {b}
+            </span>
+          );
+        })}
+      </div>
+      <p className="muted">
+        {stats.next
+          ? `Noch ${stats.next.missing} ${stats.next.missing === 1 ? 'Fahrt' : 'Fahrten'} bis zum Abzeichen für ${stats.next.at} Fahrten.`
+          : 'Du hast alle Abzeichen. Danke für deine Treue!'}
+      </p>
+      {older.length > 0 && (
+        <p className="muted">Frühere Saisons: {older.map((s) => `${s.season}: ${s.count}`).join(' · ')}</p>
+      )}
+    </section>
   );
 }

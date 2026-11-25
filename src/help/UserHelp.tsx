@@ -115,7 +115,7 @@ export function userSections(s: Settings): HelpSection[] {
     {
       id: 'buchen',
       title: 'Buchen',
-      keywords: 'buchen interesse begleitpersonen zustiegsstelle preis bezahlen warteliste nachrücken',
+      keywords: 'buchen interesse begleitpersonen zustiegsstelle preis bezahlen warteliste nachrücken teilen whatsapp link countdown abfahrt kalender',
       body: (
         <>
           <ol>
@@ -129,6 +129,13 @@ export function userSections(s: Settings): HelpSection[] {
             <li>Nach der Buchung siehst du deinen Status auf der Fahrt und unter <b>Buchungen</b>.</li>
           </ol>
           <p><b>Bezahlt</b> wird beim Verein, nicht in der App. Ein Admin vermerkt dort, wenn du bezahlt hast. Du siehst den Fahrpreis und ob er noch offen ist in deiner Buchung.</p>
+          <h4>Countdown, Kalender und Teilen</h4>
+          <ul>
+            <li>Auf der Startseite steht deine <b>nächste Fahrt</b> mit bestätigtem Platz ganz oben, mit einem Countdown bis zur Abfahrt. In der Liste siehst du bei jeder Fahrt „heute“, „morgen“ oder „in 5 Tagen“.</li>
+            <li>In der Fahrt zählt ein Countdown bis zum Ende der Vorrang-Zeit, danach bis zur Abfahrt.</li>
+            <li><b>Zum Kalender hinzufügen</b> legt einen Termin im Handy-Kalender an.</li>
+            <li><b>Teilen</b> öffnet das Teilen-Menü des Handys, z. B. für WhatsApp. Gibt es keins (oft am Computer), wird der Link kopiert und du fügst ihn selbst ein. Wer den Link öffnet, muss sich anmelden, um die Fahrt zu sehen.</li>
+          </ul>
           <p>Ist der Bus voll, kannst du {s.waitlistEnabled ? <>dich auf die <b>Warteliste</b> setzen. Wird ein Platz frei, rückst du automatisch nach und bekommst eine Mitteilung.</> : 'dich leider nicht mehr eintragen.'}</p>
         </>
       ),
@@ -152,7 +159,7 @@ export function userSections(s: Settings): HelpSection[] {
     {
       id: 'mitteilungen',
       title: 'Mitteilungen und E-Mails',
-      keywords: 'mitteilungen benachrichtigungen glocke e-mail news',
+      keywords: 'mitteilungen benachrichtigungen glocke e-mail news info zur fahrt nachricht verein',
       body: (
         <>
           <p>Die Glocke oben rechts zeigt, wie viele neue Mitteilungen es gibt. Du bekommst eine, wenn</p>
@@ -161,9 +168,10 @@ export function userSections(s: Settings): HelpSection[] {
             <li>ein Admin deine Buchung storniert hat,</li>
             <li>du von der Warteliste nachgerückt bist,</li>
             <li>eine Fahrt abgesagt wurde, für die du angemeldet bist,</li>
+            <li>der Verein den Mitfahrern einer Fahrt etwas mitteilt („Info zur Fahrt“, z. B. ein geänderter Treffpunkt),</li>
             <li>es eine neue Fahrt oder eine neue News gibt.</li>
           </ul>
-          <p>Zusätzlich kannst du dir persönliche Meldungen und, wenn du magst, auch neue Fahrten und News per E-Mail schicken lassen. Das stellst du im <b>Profil</b> ein, sofern der Verein E-Mails eingerichtet hat. Ein roter Punkt am Tab <b>News</b> zeigt ungelesene Neuigkeiten.</p>
+          <p>Zusätzlich kannst du dir persönliche Meldungen (dazu gehört auch „Info zur Fahrt“) und, wenn du magst, auch neue Fahrten und News per E-Mail schicken lassen. Das stellst du im <b>Profil</b> ein, sofern der Verein E-Mails eingerichtet hat. Ein roter Punkt am Tab <b>News</b> zeigt ungelesene Neuigkeiten.</p>
         </>
       ),
     },
@@ -191,10 +199,12 @@ export function userSections(s: Settings): HelpSection[] {
     {
       id: 'profil',
       title: 'Profil und deine Daten',
-      keywords: 'profil name passwort design daten herunterladen konto löschen datenschutz',
+      keywords: 'profil name passwort design daten herunterladen konto löschen datenschutz statistik saison abzeichen pokal treue',
       body: (
         <>
           <ul>
+            <li><b>Deine Statistik:</b> alle Fahrten zusammen, die Fahrten der laufenden Saison (1. Juli bis 30. Juni) und frühere Saisons. Mitgezählt werden Fahrten mit bestätigtem Platz, bei denen du nicht als „fehlt“ markiert bist. Fahrten aus der Zeit vor der App zählen nur in der Gesamtzahl, wenn ein Admin sie als Startwert eingetragen hat.</li>
+            <li><b>Abzeichen</b> gibt es ab 10, 25, 50 und 100 Fahrten. Darunter steht, wie viele Fahrten bis zum nächsten fehlen.</li>
             <li><b>Name und Passwort</b> kannst du jederzeit ändern.</li>
             <li><b>Design:</b> Es gibt vier Farbwelten (Stadion-Nacht, Klassisch, Clean, Ticket). Die Wahl gilt nur auf diesem Gerät.</li>
             <li><b>Meine Daten herunterladen:</b> Du bekommst eine Datei mit allem, was über dich gespeichert ist.</li>

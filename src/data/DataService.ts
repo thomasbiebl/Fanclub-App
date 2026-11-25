@@ -2,6 +2,8 @@ import type { BookOptions, NewsPost, RosterEntry, Settings, Snapshot, Trip, User
 
 export type Result = { ok: true } | { ok: false; error: string };
 
+export type MessageResult = { ok: true; sent: number } | { ok: false; error: string };
+
 export type ImportResult = { ok: true; added: number; updated: number; promoted: number } | { ok: false; error: string };
 
 export type NewsInput = Pick<NewsPost, 'title' | 'body' | 'pinned'>;
@@ -37,6 +39,8 @@ export interface DataService {
   setBookingBus(bookingId: string, bus: number | null): Promise<Result>;
   /** Admin: removes somebody's booking (any status, ignores the cancellation deadline, not after departure). */
   adminCancelBooking(bookingId: string): Promise<Result>;
+  /** Admin: sends a message to the confirmed passengers of a trip (with `everyone` also waiting list and interest). */
+  messageTrip(tripId: string, body: string, everyone: boolean): Promise<MessageResult>;
   /** Admin: marks a booking as paid or open. */
   setBookingPaid(bookingId: string, paid: boolean): Promise<Result>;
   /** Admin: boarded (true), did not show up (false), or not recorded (null). */

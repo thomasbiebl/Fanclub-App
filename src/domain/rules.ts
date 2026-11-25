@@ -26,6 +26,46 @@ export function pastTripCount(user: User, trips: Trip[], bookings: Booking[], no
   return user.baseTrips + countedBookings(user, trips, bookings, now).filter(({ b }) => b.attended !== false).length;
 }
 
+/** Trips the user actually took in the app (departed, confirmed, not marked as no-show), oldest first. */
+export function takenTrips(user: User, trips: Trip[], bookings: Booking[], now: number): Trip[] {
+  return countedBookings(user, trips, bookings, now)
+    .filter(({ b }) => b.attended !== false)
+    .map(({ trip }) => trip)
+    .sort((a, b) => a.departure.localeCompare(b.departure));
+}
+
+/** Same local time, `weeks` weeks later (also across a daylight saving change). */
+export function addWeeks(iso: string, weeks: number): string {
+  const d = new Date(iso);
+  d.setDate(d.getDate() + 7 * weeks);
+  return d.toISOString();
+}
+
+/**
+ * How many weeks a copied trip moves, so weekday and time stay the same: until the departure is at
+ * least a day ahead. A trip that is still ahead moves by one week.
+ */
+export function copyWeeks(departure: string, now: number): number {
+  let weeks = 1;
+  while (Date.parse(addWeeks(departure, weeks)) < now + 86_400_000) weeks++;
+  return weeks;
+}
+
+/** Short hint for a trip list: "heute", "morgen", "in 5 Tagen". Empty once departed. */
+export function departureHint(departure: string, now: number): string {
+  const at = Date.parse(departure);
+  if (at <= now) return '';
+  if (at - now < 3_600_000) return `in ${Math.max(1, Math.ceil((at - now) / 60_000))} Min.`;
+  const day = (t: number) => {
+    const d = new Date(t);
+    return Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 86_400_000;
+  };
+  const days = day(at) - day(now);
+  if (days === 0) return 'heute';
+  if (days === 1) return 'morgen';
+  return `in ${days} Tagen`;
+}
+
 export function noShowCount(user: User, trips: Trip[], bookings: Booking[], now: number): number {
   return countedBookings(user, trips, bookings, now).filter(({ b }) => b.attended === false).length;
 }

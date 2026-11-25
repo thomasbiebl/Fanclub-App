@@ -117,3 +117,20 @@ describe('no help text claims a setting that does not exist', () => {
     expect(walk('src/help').length).toBeGreaterThan(3);
   });
 });
+
+describe('help covers the newer features', () => {
+  const member = text(userSections(DEFAULT_SETTINGS));
+  const admin = text(adminSections(DEFAULT_SETTINGS));
+  it('explains countdown, sharing and the statistics with badges to members', () => {
+    expect(member).toMatch(/Countdown/);
+    expect(member).toMatch(/Teilen/);
+    expect(member).toMatch(/Deine Statistik/);
+    expect(member).toMatch(/10, 25, 50 und 100 Fahrten/);
+    expect(member).toMatch(/Info zur Fahrt/);
+  });
+  it('explains copying trips and messages to passengers to admins', () => {
+    expect(admin).toMatch(/Kopieren/);
+    expect(admin).toMatch(/Nachricht an Mitfahrer/);
+    expect(admin).toMatch(/Warteliste und Interessenten/);
+  });
+});
